@@ -7,12 +7,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.academy.tuition.domain.exception.BusinessException;
 import com.academy.tuition.domain.exception.ErrorCode;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,6 +98,22 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("매핑되지 않은 경로는 404 RESOURCE_NOT_FOUND로 응답한다")
+    void noHandler() throws Exception {
+        mockMvc.perform(get("/nope"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorCode").value("RESOURCE_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("@Validated 파라미터 제약 위반(ConstraintViolationException)도 400 INVALID_INPUT으로 응답한다")
+    void constraintViolation() throws Exception {
+        mockMvc.perform(get("/samples/constraint"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_INPUT"));
+    }
+
+    @Test
     @DisplayName("지원하지 않는 메서드는 405 METHOD_NOT_ALLOWED로 응답한다")
     void methodNotAllowed() throws Exception {
         mockMvc.perform(post("/samples/business"))
@@ -128,6 +146,11 @@ class GlobalExceptionHandlerTest {
 
         @GetMapping("/samples/{id}")
         void byId(@PathVariable Long id) {}
+
+        @GetMapping("/samples/constraint")
+        void constraint() {
+            throw new ConstraintViolationException("위반", Set.of());
+        }
 
         @GetMapping("/samples/unexpected")
         void unexpected() {

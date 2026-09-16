@@ -2,21 +2,24 @@ package com.academy.tuition.support.exception;
 
 import com.academy.tuition.domain.exception.BusinessException;
 import com.academy.tuition.domain.exception.ErrorCode;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingRequestHeaderException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -50,24 +53,40 @@ public class GlobalExceptionHandler {
         return invalidInput(detail);
     }
 
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleMethodValidation(HandlerMethodValidationException e) {
+        String detail = e.getParameterValidationResults().stream()
+                .findFirst()
+                .map(result -> result.getMethodParameter().getParameterName() + ": "
+                        + result.getResolvableErrors().get(0).getDefaultMessage())
+                .orElse(ErrorCode.INVALID_INPUT.getMessage());
+        log.info("입력값 검증 실패: {}", detail);
+        return invalidInput(detail);
+    }
+
     @ExceptionHandler({
-        HandlerMethodValidationException.class,
-        MissingRequestHeaderException.class,
-        MissingServletRequestParameterException.class,
+        ConstraintViolationException.class,
+        ServletRequestBindingException.class,
         MissingServletRequestPartException.class,
         MethodArgumentTypeMismatchException.class,
         HttpMessageNotReadableException.class,
         HttpMediaTypeNotSupportedException.class,
-        MaxUploadSizeExceededException.class
+        MultipartException.class
     })
     public ResponseEntity<ErrorResponse> handleInvalidInput(Exception e) {
         log.info("입력 형식 오류: {}", e.getMessage());
         return invalidInput(ErrorCode.INVALID_INPUT.getMessage());
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoResource(NoResourceFoundException e) {
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNoResource(Exception e) {
         return respond(ErrorCode.RESOURCE_NOT_FOUND);
+    }
+
+    /** 클라이언트가 JSON을 받지 않겠다고 한 경우. 본문을 만들 수 없으므로 상태만 돌려준다. */
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<Void> handleNotAcceptable(HttpMediaTypeNotAcceptableException e) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
