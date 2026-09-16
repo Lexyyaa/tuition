@@ -17,18 +17,20 @@ disable-model-invocation: true
 
 ## 0. 사전 확인
 
+- 마지막으로 완료된 기능의 PR이 머지됐는지 확인하고 `main`을 최신화한다
+  - 절차: `.claude/skills/run-feature/pull-request.md`의 "다음 스킬이 시작할 때"
+- 작업 트리가 깨끗한지 확인한다
+  - 아니면 → 🛑 멈춤: 변경 목록을 보여주고 처리 방법을 묻는다
+- `main`에서 `feature/docs` 브랜치를 만든다
 - 미완료 기능이 있으면 → 🛑 멈춤
   - 남은 기능 목록과 함께 "구현을 멈추고 마무리로 넘어갈까요?"를 묻는다
   - 넘어가기로 하면 남은 기능을 task_list "결정 필요 / 보류"로 옮긴다
     - 사유와 함께 옮긴다
-- 마지막 기능의 PR이 머지됐는지 확인하고 `main`을 최신화한다
-  - 절차: `.claude/skills/run-feature/pull-request.md`의 "다음 스킬이 시작할 때"
-- 작업 트리가 깨끗한지 확인한 뒤 `feature/docs` 브랜치를 만든다
+    - 커밋: `docs: 미구현 기능 보류 처리`
 
 ## 1. 실행 케이스 정리
 
 - `http/*.http`를 훑어 기능별 요청이 모두 남아 있는지 확인한다
-  - 머지 중 유실 전례가 있다
 - `@expect`가 빠진 요청이 없는지 확인한다
   - 기준: `.claude/skills/verify-http/SKILL.md` 작성 규칙
 - 파일 맨 위에 사용법 주석(서버 실행 명령 · 요청 순서 의존성)을 단다
@@ -38,11 +40,13 @@ disable-model-invocation: true
 
 - `doc-writer`를 호출한다
   - 지시:
-    - "`01` §4의 모든 SUB 항목을 채워 README를 제출용으로 다시 써라."
-    - "AI 활용 내역은 `docs/ai-log/`를 요약한다."
+    - "`01` §4의 모든 SUB 항목을 채워 README를 제출용으로 다시 쓴다."
+    - "AI 활용 내역은 `docs/ai-log/README.md`에 쓴다. 기능별 ai-log를 요약한다."
     - "미구현·보류 항목은 README의 한계 절에 사유와 함께 적는다"
 - `OpenApiConfig`의 TODO(제목·설명)가 남았으면 채운다
-- 커밋
+  - 커밋: `chore: OpenAPI 제목·설명 작성`
+- `01` §4 SUB 표의 완료 칸을 체크한다
+- 커밋 (각 커밋에 task_list T9-x 체크를 넣는다)
   - `docs: README 작성 (실행 방법·기술 스택 및 선택 이유·API)`
   - `docs: AI 활용 내역 정리`
 
@@ -50,17 +54,15 @@ disable-model-invocation: true
 
 - `verifier`를 **구현 점검 모드, 대상 전체 + SUB**로 호출한다
 - 높음 지적
-  - 문서만 고치면 되는 것 → `doc-writer`로 고친다
+  - 문서만 고치면 되는 것 → `doc-writer`로 고치고 `verifier`를 한 번 더 돌린다
   - 코드를 고쳐야 하는 것 → 🛑 멈춤
     - 남은 시간과 함께 고칠지 README 한계로 남길지 묻는다
 
 ## 4. 최종 게이트
 
-- 초기화 후 빌드한다
-  - `docker compose down -v && docker compose up -d`
-  - → `./gradlew clean spotlessApply build`
+- `./gradlew clean spotlessApply build`
 - `.claude/skills/verify-http/SKILL.md`의 "순서"를 대상 전체로 실행한다
-  - 초기화된 DB에서 seed부터 다시 확인하는 셈이다
+  - 그 절차가 DB를 초기화하므로 seed부터 다시 확인하는 셈이다
 - 불일치가 있으면 → 🛑 멈춤: 고칠지 README 한계로 남길지 묻는다
 
 ## 5. 마무리

@@ -35,40 +35,60 @@ Content-Type: application/json
 Idempotency-Key: 11111111-1111-1111-1111-111111111111
 
 { "productId": 1, "quantity": 2 }
+
+### [TC-2-05] 종결된 주문 취소 시 409
+# @uses orderId = [TC-2-01].$.id
+# @expect 409
+# @expect $.errorCode == "INVALID_STATUS_TRANSITION"
+POST {{host}}/orders/{{orderId}}/cancel
 ```
 
 - `# @expect {상태코드}` — 필수
+- `# @expect $.errorCode == "..."` — 에러 케이스는 필수
+  - 같은 400끼리 거짓 통과가 나지 않게
 - `# @expect $.필드 == 값` — 부분 성공 · 생성 API는 필수
   - 상태코드만 보면 거짓 통과가 난다
 - `# @db {SQL} => {기대값}` — 저장 · 변경이 있는 요청은 필수
 - 앞 요청의 응답 값(id 등)을 쓰는 요청은 의존을 적는다
-  - 형식: `# @uses [TC-x-yy].$.id`
+  - 선언: `# @uses {변수} = [TC-x-yy].$.경로`
+  - 사용: 경로 · 헤더 · 본문에 `{{변수}}`
+  - 같은 파일의 앞 요청, 또는 앞 파일(F 순서)의 요청만 참조한다
 
 ## 순서
 
 1. **대상 결정**
    - 인자가 `F번호`면 task_list에서 브랜치 이름을 찾아 `http/{name}.http`
    - 파일명이면 그 파일
-   - 없으면 전체
-2. **서버 기동**
-   - `docker compose up -d`
-     - → `docker exec app-mysql mysqladmin ping -uapp -papp --silent`
-     - 이 명령이 될 때까지 대기
-   - `./gradlew bootRun`을 백그라운드로 실행
+   - 없으면 전체 — task_list의 F 순서대로 파일을 돈다
+2. **DB 초기화 · 서버 기동**
+   - `docker compose down -v && docker compose up -d`
+     - 매번 빈 DB에서 시작한다
+     - 이전 실행의 데이터(멱등 키 · UNIQUE 값)가 남으면 거짓 불일치가 난다
+     - `ddl-auto: update`가 반영 못 하는 제약 변경도 이렇게 반영된다
+   - 아래 명령이 성공할 때까지 대기한다
+     - `docker exec app-mysql mysql -uapp -papp app -e "SELECT 1"`
+     - `mysqladmin ping`은 초기화 중인 임시 서버에도 응답하므로 쓰지 않는다
+   - 8080이 비어 있는지 확인한다: `lsof -i :8080`
+     - 남아 있으면 `lsof -ti :8080 | xargs kill` 후 다시 확인
+   - `./gradlew bootRun > build/bootrun.log 2>&1 &`
      - → `curl -s localhost:8080/actuator/health`가 `UP`일 때까지 대기
      - 최대 90초
-   - 기동 실패 → 로그 마지막 부분과 함께 🛑 멈춤
+   - 기동 실패 → `build/bootrun.log` 마지막 부분과 함께 🛑 멈춤
 3. **요청 재연**: 파일 순서대로 각 요청을 `curl -s -w '\n%{http_code}'`로 보낸다
-   - `@uses`가 있으면 앞 응답에서 값을 꺼내 치환한다
+   - `@uses`가 있으면 앞 응답에서 값을 꺼내 `{{변수}}`를 치환한다
    - 멀티파트는 `curl -F 'files=@http/sample/파일'`로 실제 파일을 붙인다
 4. **대조**
    - 상태코드
    - `$.필드` (jq 또는 응답 파싱)
    - `@db` 쿼리
-     - `docker exec app-mysql mysql -uapp -papp app -N -e "..."`
-   - 서버 로그에 `ERROR`가 새로 찍혔는지 확인한다
+     - `docker exec -e MYSQL_PWD=app app-mysql mysql -uapp app -N -e "..."`
+     - `-p암호`를 쓰면 경고가 출력에 섞이므로 환경 변수로 넘긴다
+   - `build/bootrun.log`에 `ERROR`가 새로 찍혔는지 확인한다
      - 4xx 기대 요청에서 ERROR가 나오면 불일치로 본다
-5. **서버 종료**: bootRun 프로세스를 내린다. MySQL 컨테이너는 켜 둔다
+5. **서버 종료**
+   - `lsof -ti :8080 | xargs kill`
+   - `lsof -i :8080`이 비었는지 확인한다
+   - MySQL 컨테이너는 켜 둔다
 
 ## 보고
 

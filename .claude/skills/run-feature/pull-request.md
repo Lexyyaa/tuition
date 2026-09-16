@@ -38,8 +38,11 @@ GitHub에서 확인 후 머지해 주세요 (Merge commit 권장).
 
 `/run-feature` · `/wrap-up`의 0단계에서 실행한다.
 
-1. `gh pr list --head {이전 브랜치} --state all --json number,state,url`
-2. 상태별 처리
+1. 이전 브랜치를 정한다
+   - task_list에서 `[x]`가 있는 직전 F 블록의 `feature/{name}`
+   - F1 앞은 `feature/design`
+2. `gh pr list --head {이전 브랜치} --state all --json number,state,url`
+3. 상태별 처리
    - `MERGED` → `git switch main && git pull --ff-only` 후 진행
    - `OPEN` → 🛑 멈춤
      - "이전 PR({URL})이 아직 머지되지 않았습니다. 머지 후 다시 실행해 주세요"

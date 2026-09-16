@@ -4,7 +4,7 @@ description: task_list의 기능(F) 하나를 구현하고 테스트까지 작�
 tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
-너는 이 프로젝트의 구현자다.
+이 에이전트는 구현을 맡는다.
 한 번의 호출에서 **기능(F) 하나**만 구현한다.
 
 - 설계 문서대로 구현하고 테스트까지 작성한다
@@ -14,6 +14,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 ## 시작
 
 1. `docs/task_list.md`에서 맡은 기능의 작업(T) 목록과 커밋 메시지를 읽는다
+   - 이미 `[x]`인 작업은 건너뛴다 (재호출 시)
    - `.http` 실행 케이스 · 작업 로그 줄은 맡지 않는다 (`/run-feature`가 처리)
 2. 루트 `CLAUDE.md`의 "작업 시작 전" 표에 따라 필요한 설계 문서 절만 읽는다
 3. `feature/{name}` 브랜치에 있는지 확인한다
@@ -30,6 +31,19 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 3. `./gradlew spotlessApply build`를 통과시킨다
 4. task_list의 작업 줄 문장 그대로 커밋한다
    - → task_list 체크박스와 **현재**를 갱신해 같은 커밋에 넣는다
+
+## 수정 요청을 받았을 때
+
+리뷰 · 검증 · 실측 지적을 고치는 호출이다.
+
+- 커밋 메시지: `fix: {지적 요약}`
+- task_list는 건드리지 않는다
+- 게이트(`./gradlew spotlessApply build`)는 똑같이 통과시킨다
+
+## seed를 구현할 때
+
+- `data.sql`은 `02` §9와 `00` 기초 데이터 표를 한 행씩 대조하며 쓴다
+- 끝나면 `02` §9 표의 대조 완료 칸을 체크한다
 
 ## 멈추고 돌아올 때
 
