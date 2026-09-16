@@ -55,10 +55,14 @@ public final class ConcurrencyRunner {
             });
         }
 
-        ready.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        start.countDown();
-        boolean finished = done.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        executor.shutdownNow();
+        boolean finished;
+        try {
+            ready.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            start.countDown();
+            finished = done.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } finally {
+            executor.shutdownNow();
+        }
         if (!finished) {
             throw new IllegalStateException("동시성 작업이 " + TIMEOUT_SECONDS + "초 안에 끝나지 않았습니다 (데드락 의심)");
         }

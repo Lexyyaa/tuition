@@ -49,7 +49,10 @@ class ArchitectureTest {
             .whereLayer("Domain")
             .mayOnlyBeAccessedByLayers("Application", "Infrastructure", "Support")
             .whereLayer("Infrastructure")
-            .mayNotBeAccessedByAnyLayer();
+            .mayNotBeAccessedByAnyLayer()
+            // domain은 properties·config를 직접 받지 않는다. 정책값은 application이 읽어 인자로 넘긴다
+            .whereLayer("Support")
+            .mayOnlyBeAccessedByLayers("Presentation", "Application", "Infrastructure");
 
     @ArchTest
     static final ArchRule 도메인은_웹_계층을_모른다 = noClasses()
@@ -94,6 +97,18 @@ class ArchitectureTest {
             .areAnnotatedWith(Entity.class)
             .should()
             .resideInAPackage(DOMAIN)
+            .allowEmptyShould(true);
+
+    @ArchTest
+    static final ArchRule 스프링데이터_인터페이스는_infrastructure에 = classes()
+            .that()
+            .areInterfaces()
+            .and()
+            .areAssignableTo(org.springframework.data.repository.Repository.class)
+            .should()
+            .resideInAPackage(INFRASTRUCTURE)
+            .andShould()
+            .haveSimpleNameEndingWith("JpaRepository")
             .allowEmptyShould(true);
 
     @ArchTest
