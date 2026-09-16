@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '8.10.2'
 }
 
 group = 'com.academy'
@@ -35,6 +36,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mysql'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.0'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -44,3 +46,25 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+// 구조 규칙만 따로 돌린다 (DB 불필요). `test`에도 포함되어 build에서 함께 검사된다
+tasks.register('archTest', Test) {
+    description = 'Runs ArchUnit architecture rules.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching '*ArchitectureTest'
+    }
+}
+
+// 포매팅 규칙. `check`(= build)에 spotlessCheck가 연결되어 위반 시 빌드가 깨진다
+spotless {
+    java {
+        target 'src/**/*.java'
+        palantirJavaFormat('2.98.0')
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
