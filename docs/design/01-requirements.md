@@ -81,6 +81,11 @@
 | TC-1-07 | 성공 | Domain | 수강 기간 VO — 시작일만 (종료일 null) | 무기한 기간으로 생성 | — |
 | TC-1-08 | 실패 | Domain | 수강 기간 VO — 종료일 < 시작일 | `IllegalArgumentException` | — |
 | TC-1-09 | 성공 | Service | `data.sql` 로딩 | 학원(플랜·할인 설정 포함) · 학부모 · 수강생 · 강좌 seed 건수가 02 §9 기준과 일치 | — |
+| TC-1-10 | 성공 | Domain | 고지 월 VO를 yyyy-MM 문자열 · YearMonth로 생성 | 값을 yyyy-MM으로 보관 | — |
+| TC-1-11 | 실패 | Domain | 고지 월 VO를 형식 오류 값(2026-3 · 2026-13)으로 생성 | `IllegalArgumentException` | — |
+| TC-1-12 | 엣지 | Domain | 금액 VO — 0원 생성 · 동등성 비교 | 0원 허용, 값 동등 판정 | — |
+| TC-1-13 | 엣지 | Domain | 수업 요일 VO — 중복 요소 · 저장 문자열 왕복 · 잘못된 토큰 | 중복 IAE · MON,WED,FRI 왕복 · 잘못된 토큰 IAE | — |
+| TC-1-14 | 엣지 | Domain | 수강 기간 VO — 하루짜리(시작=종료) · 시작일 null | 하루짜리 허용 · null IAE | — |
 
 ### F2. 학원 식별과 강좌 · 수강
 

@@ -32,7 +32,7 @@ class MoneyTest {
     }
 
     @Test
-    @DisplayName("금액 VO를 0원으로 생성할 수 있다 (경계)")
+    @DisplayName("[TC-1-12] 금액 VO를 0원으로 생성할 수 있다 (경계)")
     void createZeroMoney() {
         // given
         long zero = 0L;
@@ -45,7 +45,7 @@ class MoneyTest {
     }
 
     @Test
-    @DisplayName("금액이 같으면 같은 값으로 판정한다")
+    @DisplayName("[TC-1-12] 금액이 같으면 같은 값으로 판정한다")
     void equality() {
         // given
         Money a = Money.of(1_000L);

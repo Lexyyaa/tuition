@@ -187,3 +187,16 @@
 - `@OneToMany` 컬렉션 순서에 의존하면서 `@OrderBy`가 없다
 - 부분 성공 API를 상태코드로만 검증한다
   - → 200인데 저장 0건인 거짓 통과
+- `@AttributeOverride`는 embeddable의 `@Column` 정의를 통째로 대체한다
+  - → `nullable = false` · `length`를 재선언한다
+- 식별자 참조(plain `Long`) 컬럼은 FK·인덱스가 자동 생성되지 않는다
+  - → ERD가 FK로 표기한 컬럼은 `@Table(indexes = ...)`를 직접 선언한다
+
+## 병렬 실행
+
+- 서로 결과에 의존하지 않는 단계만 병렬로 돌린다
+  - `reviewer` ∥ `verifier` (스킬에 명시)
+  - ai-log 작성 ∥ 게이트 빌드
+  - 서로 다른 파일만 만지는 독립 작업이 명확할 때의 `implementer` 분할
+    - 커밋 정리는 메인 세션이 순서대로 한다
+- 같은 파일이나 같은 브랜치의 커밋 순서를 만지는 작업은 병렬로 돌리지 않는다

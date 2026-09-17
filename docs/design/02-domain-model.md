@@ -558,7 +558,8 @@ erDiagram
   - `send_attempt.fail_reason` · `send_attempt.confirmed_at` — 확정 후
   - `send_attempt.requested_at` — `PENDING` 보류 동안 null
   - `billing_job.finished_at` — 완료 후
-- FK 컬럼 인덱스는 FK 제약 생성 시 함께 만들어진다
+- FK 컬럼 인덱스는 `@JoinColumn`(애그리거트 내부)에서만 자동 생성된다
+  - 식별자 참조(plain `Long`) 컬럼은 물리 FK 없이 쓴다 — 인덱스가 자동 생성되지 않으므로 `@Table(indexes = ...)`로 직접 선언한다 (parent.academy_id · course.academy_id 포함)
 - 강좌 행 `FOR UPDATE`는 PK 조회라 별도 인덱스가 필요 없다
 - `shedlock`은 ShedLock 방식 락 테이블 (D-44) — 도메인 아님, `BaseTimeEntity` 미적용
 

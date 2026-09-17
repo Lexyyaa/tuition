@@ -36,7 +36,7 @@ class EnrollmentPeriodTest {
     }
 
     @Test
-    @DisplayName("수강 기간 VO는 시작일과 종료일이 같은 하루짜리 기간을 허용한다 (경계)")
+    @DisplayName("[TC-1-14] 수강 기간 VO는 시작일과 종료일이 같은 하루짜리 기간을 허용한다 (경계)")
     void createSameDayPeriod() {
         // given
         LocalDate date = LocalDate.of(2026, 3, 10);
@@ -51,7 +51,7 @@ class EnrollmentPeriodTest {
     }
 
     @Test
-    @DisplayName("수강 기간 VO의 시작일이 null이면 IllegalArgumentException이 발생한다")
+    @DisplayName("[TC-1-14] 수강 기간 VO의 시작일이 null이면 IllegalArgumentException이 발생한다")
     void createWithoutStartDate() {
         // given
         LocalDate endDate = LocalDate.of(2026, 3, 31);

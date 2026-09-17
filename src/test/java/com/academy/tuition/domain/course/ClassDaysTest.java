@@ -37,7 +37,7 @@ class ClassDaysTest {
     }
 
     @Test
-    @DisplayName("수업 요일 목록에 중복이 있으면 IllegalArgumentException이 발생한다")
+    @DisplayName("[TC-1-13] 수업 요일 목록에 중복이 있으면 IllegalArgumentException이 발생한다")
     void createDuplicatedClassDays() {
         // given
         List<DayOfWeek> duplicated = List.of(DayOfWeek.MONDAY, DayOfWeek.MONDAY);
@@ -47,7 +47,7 @@ class ClassDaysTest {
     }
 
     @Test
-    @DisplayName("저장 문자열은 MON,WED,FRI 형식으로 자연 순서를 유지하고 왕복 변환된다")
+    @DisplayName("[TC-1-13] 저장 문자열은 MON,WED,FRI 형식으로 자연 순서를 유지하고 왕복 변환된다")
     void storageStringRoundTrip() {
         // given — 입력 순서가 뒤섞여도 저장은 자연 순서다
         ClassDays classDays = ClassDays.of(List.of(DayOfWeek.FRIDAY, DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY));
@@ -62,7 +62,7 @@ class ClassDaysTest {
     }
 
     @Test
-    @DisplayName("알 수 없는 요일 토큰의 저장 문자열은 IllegalArgumentException이 발생한다")
+    @DisplayName("[TC-1-13] 알 수 없는 요일 토큰의 저장 문자열은 IllegalArgumentException이 발생한다")
     void fromInvalidStorageString() {
         // given
         String invalid = "MON,XXX";

@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class BillingMonthTest {
 
     @Test
-    @DisplayName("고지 월 VO를 yyyy-MM 문자열로 생성하면 값을 그대로 보관한다")
+    @DisplayName("[TC-1-10] 고지 월 VO를 yyyy-MM 문자열로 생성하면 값을 그대로 보관한다")
     void createBillingMonth() {
         // given
         String value = "2026-03";
@@ -27,14 +27,14 @@ class BillingMonthTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"2026-3", "202603", "2026-13", "2026-00", "2026/03"})
-    @DisplayName("고지 월 VO를 yyyy-MM 형식이 아닌 값으로 생성하면 IllegalArgumentException이 발생한다")
+    @DisplayName("[TC-1-11] 고지 월 VO를 yyyy-MM 형식이 아닌 값으로 생성하면 IllegalArgumentException이 발생한다")
     void createInvalidBillingMonth(String invalid) {
         // given · when · then
         assertThatThrownBy(() -> BillingMonth.of(invalid)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("고지 월 VO를 YearMonth로 생성하면 yyyy-MM 문자열로 변환해 보관한다")
+    @DisplayName("[TC-1-10] 고지 월 VO를 YearMonth로 생성하면 yyyy-MM 문자열로 변환해 보관한다")
     void createFromYearMonth() {
         // given
         YearMonth yearMonth = YearMonth.of(2026, 3);

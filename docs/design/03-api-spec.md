@@ -802,6 +802,8 @@ Body 없음
 
 ## 4. 에러 코드
 
+> 예외는 도메인당 단일 `{Domain}Exception` + `ErrorCode` 방식이다 (src/main/CLAUDE.md 규칙 — 상황별 예외 클래스를 만들지 않는다)
+
 ### 공통
 
 | errorCode | HTTP | 메시지 | 발생 조건 |
@@ -827,36 +829,36 @@ Body 없음
 
 | errorCode | HTTP | 메시지 | 발생 조건 | 예외 클래스 | API |
 |---|---|---|---|---|---|
-| `ACADEMY_NOT_FOUND` | 404 | 학원을 찾을 수 없습니다. | 헤더의 학원 미존재 (D-32) | `AcademyNotFoundException` | 헤더 필요한 전부 |
-| `PARENT_NOT_FOUND` | 404 | 학부모를 찾을 수 없습니다. | 없거나 타 학원 학부모 | `ParentNotFoundException` | API-3 |
-| `STUDENT_NOT_FOUND` | 404 | 수강생을 찾을 수 없습니다. | 없거나 타 학원 수강생 | `StudentNotFoundException` | API-6 |
+| `ACADEMY_NOT_FOUND` | 404 | 학원을 찾을 수 없습니다. | 헤더의 학원 미존재 (D-32) | `AcademyException` | 헤더 필요한 전부 |
+| `PARENT_NOT_FOUND` | 404 | 학부모를 찾을 수 없습니다. | 없거나 타 학원 학부모 | `ParentException` | API-3 |
+| `STUDENT_NOT_FOUND` | 404 | 수강생을 찾을 수 없습니다. | 없거나 타 학원 수강생 | `ParentException` | API-6 |
 
 ### 강좌 · 수강
 
 | errorCode | HTTP | 메시지 | 발생 조건 | 예외 클래스 | API |
 |---|---|---|---|---|---|
-| `COURSE_NOT_FOUND` | 404 | 강좌를 찾을 수 없습니다. | 없거나 타 학원 강좌 (FR-2.2) | `CourseNotFoundException` | API-5 · API-6 |
-| `COURSE_CAPACITY_EXCEEDED` | 409 | 정원을 초과했습니다. | 현재 인원 ≥ 정원 (FR-2.8) | `CourseCapacityExceededException` | API-6 |
-| `ENROLLMENT_NOT_FOUND` | 404 | 수강 등록을 찾을 수 없습니다. | 없거나 타 학원 등록 | `EnrollmentNotFoundException` | API-7 |
-| `ENROLLMENT_PERIOD_OVERLAPPED` | 409 | 수강 기간이 중복됩니다. | 같은 수강생 · 강좌 기간 겹침 (FR-2.9) | `EnrollmentPeriodOverlappedException` | API-6 |
-| `INVALID_ENROLLMENT_PERIOD` | 400 | 수강 기간이 올바르지 않습니다. | 종료일 < 시작일 (FR-2.7) | `InvalidEnrollmentPeriodException` | API-7 |
+| `COURSE_NOT_FOUND` | 404 | 강좌를 찾을 수 없습니다. | 없거나 타 학원 강좌 (FR-2.2) | `CourseException` | API-5 · API-6 |
+| `COURSE_CAPACITY_EXCEEDED` | 409 | 정원을 초과했습니다. | 현재 인원 ≥ 정원 (FR-2.8) | `CourseException` | API-6 |
+| `ENROLLMENT_NOT_FOUND` | 404 | 수강 등록을 찾을 수 없습니다. | 없거나 타 학원 등록 | `EnrollmentException` | API-7 |
+| `ENROLLMENT_PERIOD_OVERLAPPED` | 409 | 수강 기간이 중복됩니다. | 같은 수강생 · 강좌 기간 겹침 (FR-2.9) | `EnrollmentException` | API-6 |
+| `INVALID_ENROLLMENT_PERIOD` | 400 | 수강 기간이 올바르지 않습니다. | 종료일 < 시작일 (FR-2.7) | `EnrollmentException` | API-7 |
 
 ### 고지서 · 납부
 
 | errorCode | HTTP | 메시지 | 발생 조건 | 예외 클래스 | API |
 |---|---|---|---|---|---|
-| `INVOICE_NOT_FOUND` | 404 | 고지서를 찾을 수 없습니다. | 없거나 타 학원 고지서 (D-25) | `InvoiceNotFoundException` | API-9 · API-11 · API-15 · API-16 |
-| `INVOICE_ITEM_NOT_FOUND` | 404 | 고지서 항목을 찾을 수 없습니다. | 고지서에 없는 항목 (FR-3.5) | `InvoiceItemNotFoundException` | API-9 |
-| `INVOICE_MODIFY_BELOW_PAID` | 409 | 납부액 미만으로 수정할 수 없습니다. | 수정액 < 납부 합산 (FR-3.15) | `InvoiceModifyBelowPaidException` | API-9 |
-| `PAYMENT_EXCEEDS_BALANCE` | 409 | 잔액을 초과하는 납부입니다. | 납부액 > 잔액 (FR-6.6) | `PaymentExceedsBalanceException` | API-11 |
-| `IDEMPOTENCY_KEY_REQUIRED` | 400 | Idempotency-Key 헤더가 필요합니다. | 헤더 누락 (FR-6.4) | `IdempotencyKeyRequiredException` | API-11 |
-| `IDEMPOTENCY_KEY_CONFLICT` | 422 | 같은 키로 다른 요청이 이미 처리됐습니다. | 같은 키 · 다른 본문 (FR-6.5) | `IdempotencyKeyConflictException` | API-11 |
+| `INVOICE_NOT_FOUND` | 404 | 고지서를 찾을 수 없습니다. | 없거나 타 학원 고지서 (D-25) | `InvoiceException` | API-9 · API-11 · API-15 · API-16 |
+| `INVOICE_ITEM_NOT_FOUND` | 404 | 고지서 항목을 찾을 수 없습니다. | 고지서에 없는 항목 (FR-3.5) | `InvoiceException` | API-9 |
+| `INVOICE_MODIFY_BELOW_PAID` | 409 | 납부액 미만으로 수정할 수 없습니다. | 수정액 < 납부 합산 (FR-3.15) | `InvoiceException` | API-9 |
+| `PAYMENT_EXCEEDS_BALANCE` | 409 | 잔액을 초과하는 납부입니다. | 납부액 > 잔액 (FR-6.6) | `PaymentException` | API-11 |
+| `IDEMPOTENCY_KEY_REQUIRED` | 400 | Idempotency-Key 헤더가 필요합니다. | 헤더 누락 (FR-6.4) | `PaymentException` | API-11 |
+| `IDEMPOTENCY_KEY_CONFLICT` | 422 | 같은 키로 다른 요청이 이미 처리됐습니다. | 같은 키 · 다른 본문 (FR-6.5) | `PaymentException` | API-11 |
 
 ### 작업 · 발송
 
 | errorCode | HTTP | 메시지 | 발생 조건 | 예외 클래스 | API |
 |---|---|---|---|---|---|
-| `BILLING_JOB_NOT_FOUND` | 404 | 발송 작업을 찾을 수 없습니다. | 해당 (월, 학원) 작업 없음 (D-13) | `BillingJobNotFoundException` | API-13 · API-14 |
-| `INVALID_RESULT_CODE` | 400 | 알 수 없는 결과 코드입니다. | 세 코드 외 웹훅 (FR-5.3) | `InvalidResultCodeException` | API-10 |
-| `RESEND_NOT_ALLOWED` | 409 | 재발송할 수 없는 상태입니다. | `SENT` 등 (FR-7.4) | `ResendNotAllowedException` | API-16 |
-| `INVALID_STATUS_TRANSITION` | 409 | 허용되지 않는 상태 전이입니다. | 02 §4 표 밖의 전이 | `InvalidStatusTransitionException` | 내부 방어 |
+| `BILLING_JOB_NOT_FOUND` | 404 | 발송 작업을 찾을 수 없습니다. | 해당 (월, 학원) 작업 없음 (D-13) | `BillingException` | API-13 · API-14 |
+| `INVALID_RESULT_CODE` | 400 | 알 수 없는 결과 코드입니다. | 세 코드 외 웹훅 (FR-5.3) | `DeliveryException` | API-10 |
+| `RESEND_NOT_ALLOWED` | 409 | 재발송할 수 없는 상태입니다. | `SENT` 등 (FR-7.4) | `InvoiceException` | API-16 |
+| `INVALID_STATUS_TRANSITION` | 409 | 허용되지 않는 상태 전이입니다. | 02 §4 표 밖의 전이 | `InvoiceException` | 내부 방어 |
