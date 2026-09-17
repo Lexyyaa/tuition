@@ -6,7 +6,7 @@
 > - API: [03](design/03-api-spec.md)
 >
 
-**현재:** F1 / T1-2
+**현재:** F1 / T1-3
 
 ## 규칙
 
@@ -60,7 +60,7 @@
 ## F1. 기초 설정 `feature/setup`
 
 - [x] T1-1 `feat: 공통 값 객체 및 enum 구현` — 02 §1 (Money · PaymentDay · ClassDays · EnrollmentPeriod · BillingMonth)
-- [ ] T1-2 `feat: 도메인 에러 코드 추가` — 03 §4
+- [x] T1-2 `feat: 도메인 에러 코드 추가` — 03 §4
 - [ ] T1-3 `feat: 기초 데이터 엔티티 및 seed 구현` — 02 §9 대조 완료 체크 · TC-1-09
 - [ ] T1-4 `test: 값 객체 성공·실패·엣지 케이스` — TC-1-01 ~ TC-1-08
 - [ ] T1-5 `docs: F1 작업 로그`
